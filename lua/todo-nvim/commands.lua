@@ -95,9 +95,9 @@ M.setup = function()
     pattern = "markdown",
     callback = function()
       if vim.fn.expand("%:p"):match("^/Users/.*/.todo/todo%d+.md$") then
-        vim.api.nvim_set_keymap("n", "<leader>ta", ":lua require('my_plugin.commands').add_task()<CR>", { noremap = true, silent = true })
-        vim.api.nvim_set_keymap("n", "<leader>tc", ":lua require('my_plugin.commands').toggle_complete()<CR>", { noremap = true, silent = true })
-        vim.api.nvim_set_keymap("n", "<leader>ti", ":lua require('my_plugin.commands').toggle_incomplete()<CR>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap("n", "<leader>ta", ":lua require('todo-nvim.commands').add_task()<CR>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap("n", "<leader>tc", ":lua require('todo-nvim.commands').toggle_complete()<CR>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap("n", "<leader>ti", ":lua require('todo-nvim.commands').toggle_incomplete()<CR>", { noremap = true, silent = true })
       end
     end,
   })
