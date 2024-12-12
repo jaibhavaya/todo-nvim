@@ -1,11 +1,13 @@
 local config = require("todo-nvim.config")
 local commands = require("todo-nvim.commands")
+local highlights = require("todo-nvim.highlights")
 
 local M = {}
 
 M.setup = function(user_config)
   -- Pass user configuration to the shared config module
   config.setup(user_config)
+	highlights.setup()
 
   -- Register commands
   commands.register()
