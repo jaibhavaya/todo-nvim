@@ -13,8 +13,8 @@ end
 # Usage:
 ```
 - `:Todo` to open todo list (will create a todo file if one doesn't exist for the day, and will copy over any incomplete tasks from the previous day)
-- <leader>ta to add a task
-- <leader>tc to toggle a task as complete
-- <leader>ti to toggle a task as incomplete
+- `:TodoAdd` to add a task (default <leader>ta)
+- `:TodoComplete` to toggle a task as complete (default <leader>tc)
+- `:TodoIncomplete` to toggle a task as incomplete (default <leader>ti)
 ```
 
