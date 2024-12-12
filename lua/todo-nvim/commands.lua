@@ -1,12 +1,12 @@
 local M = {}
 
 local function open_or_create_todo()
-  local todo_dir = vim.fn.expand("~/.todo/")
+  local todo_dir = config.todo_dir
   local today = os.date("%Y%m%d")
   local today_file = "todo" .. today .. ".md"
   local today_path = todo_dir .. today_file
 
-  -- Ensure the ~/.todo directory exists
+  -- Ensure the todo directory exists
   if vim.fn.isdirectory(todo_dir) == 0 then
     vim.fn.mkdir(todo_dir, "p")
   end
@@ -24,30 +24,24 @@ local function open_or_create_todo()
   -- Create today's file if it doesn't exist
   if vim.fn.filereadable(today_path) == 0 then
     local last_file = get_last_todo_file()
-
     local file = io.open(today_path, "w")
     file:write("# To-Do List for " .. os.date("%Y-%m-%d") .. "\n\n")
     file:close()
 
-    -- Find the last to-do file
-		print(last_file)
+    -- Append incomplete tasks from the last file
     if last_file then
       local last_file_lines = {}
-      -- Read lines from the last file
       for line in io.lines(last_file) do
         table.insert(last_file_lines, line)
       end
 
-      -- Extract incomplete tasks
       local incomplete_tasks = {}
       for _, line in ipairs(last_file_lines) do
-				print(line)
         if line:match("^%[ %]") then
           table.insert(incomplete_tasks, line)
         end
       end
 
-      -- Append incomplete tasks to today's file
       if #incomplete_tasks > 0 then
         local today_file_handle = io.open(today_path, "a")
         today_file_handle:write("## Incomplete Tasks from " .. last_file:match("todo(%d+).md") .. "\n")
@@ -59,7 +53,6 @@ local function open_or_create_todo()
     end
   end
 
-  -- Open today's file
   vim.cmd("edit " .. today_path)
 end
 
@@ -89,15 +82,46 @@ local function toggle_incomplete()
   end
 end
 
-M.setup = function()
-  -- Keybindings
+vim.api.nvim_create_user_command("TodoAdd", function()
+  local task_description = vim.fn.input("Task description: ")
+  if task_description and task_description ~= "" then
+    local buf = vim.api.nvim_get_current_buf()
+    local last_line = vim.api.nvim_buf_line_count(buf)
+    vim.api.nvim_buf_set_lines(buf, last_line, last_line, false, { "", "[ ] " .. task_description })
+  end
+end, {})
+
+vim.api.nvim_create_user_command("TodoComplete", function()
+  local line = vim.fn.getline(".")
+  if line:match("^%[ %]") then
+    vim.fn.setline(".", (line:gsub("^%[ %]", "[X]")))
+  end
+end, {})
+
+vim.api.nvim_create_user_command("TodoIncomplete", function()
+  local line = vim.fn.getline(".")
+  if line:match("^%[X%]") then
+    vim.fn.setline(".", (line:gsub("^%[X%]", "[ ]")))
+  end
+end, {})
+
+local config = {
+  todo_dir = vim.fn.expand("~/.todo/"), -- Default directory
+}
+
+M.setup = function(user_config)
+  if user_config then
+    config = vim.tbl_deep_extend("force", config, user_config)
+  end
+
+  -- Keybindings (will use commands defined below)
   vim.api.nvim_create_autocmd("FileType", {
     pattern = "markdown",
     callback = function()
-      if vim.fn.expand("%:p"):match("^/Users/.*/.todo/todo%d+.md$") then
-        vim.api.nvim_set_keymap("n", "<leader>ta", ":lua require('todo-nvim.commands').add_task()<CR>", { noremap = true, silent = true })
-        vim.api.nvim_set_keymap("n", "<leader>tc", ":lua require('todo-nvim.commands').toggle_complete()<CR>", { noremap = true, silent = true })
-        vim.api.nvim_set_keymap("n", "<leader>ti", ":lua require('todo-nvim.commands').toggle_incomplete()<CR>", { noremap = true, silent = true })
+      if vim.fn.expand("%:p"):match("^" .. config.todo_dir .. "todo%d+.md$") then
+        vim.api.nvim_set_keymap("n", "<leader>ta", ":TodoAdd<CR>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap("n", "<leader>tc", ":TodoComplete<CR>", { noremap = true, silent = true })
+        vim.api.nvim_set_keymap("n", "<leader>ti", ":TodoIncomplete<CR>", { noremap = true, silent = true })
       end
     end,
   })
