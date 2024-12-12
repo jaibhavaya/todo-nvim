@@ -105,7 +105,7 @@ vim.api.nvim_create_user_command("TodoIncomplete", function()
   end
 end, {})
 
-local config = {
+M.config = {
   todo_dir = vim.fn.expand("~/.todo/"), -- Default directory
 }
 
