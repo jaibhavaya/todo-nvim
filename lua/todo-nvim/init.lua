@@ -24,5 +24,3 @@ M.setup = function(user_config)
 end
 
 return M
-
-return M
