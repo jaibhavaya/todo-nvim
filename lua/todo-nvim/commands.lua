@@ -64,7 +64,7 @@ function M.register()
     if task_description and task_description ~= "" then
       local buf = vim.api.nvim_get_current_buf()
       local last_line = vim.api.nvim_buf_line_count(buf)
-      vim.api.nvim_buf_set_lines(buf, last_line, last_line, false, { "", "[ ] " .. task_description })
+      vim.api.nvim_buf_set_lines(buf, last_line, last_line, false, { "[ ] " .. task_description })
     end
   end, {})
 
